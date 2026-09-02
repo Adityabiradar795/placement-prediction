@@ -2,8 +2,8 @@
 
 A two-stage machine learning system that predicts whether a student will be placed during campus recruitment, and — only if placement looks likely — estimates their starting salary.
 
-**Live app:** https://placement-prediction-1-7zh4.onrender.com
-**API:** https://placement-prediction-wxtg.onrender.com
+**Live app:** [Click here to visit the site](https://placement-prediction-1-7zh4.onrender.com)
+**API:** [Click here to visit the API](https://placement-prediction-wxtg.onrender.com)
 
 > Note: hosted on Render's free tier, so the first request after inactivity may take 30–60s while the service spins up.
 
