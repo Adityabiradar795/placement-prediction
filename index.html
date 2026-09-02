@@ -627,7 +627,7 @@
   animateParticles();
 
   // 4. API & Form Logic
-  const API_URL = "http://127.0.0.1:8000/predict";
+  const API_URL = "https://placement-prediction-wxtg.onrender.com/predict"; // Update this to your FastAPI endpoint
 
   document.querySelectorAll('input[type="range"]').forEach(slider => {
     const label = document.querySelector(`.rating-value[data-for="${slider.id}"]`);
