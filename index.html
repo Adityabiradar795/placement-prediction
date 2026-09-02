@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Placement Outlook & Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #070a12;
+    --card-bg: rgba(18, 26, 43, 0.65);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.4);
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --input-bg: rgba(10, 16, 30, 0.7);
+    --good: #10b981;
+    --good-bg: rgba(16, 185, 129, 0.15);
+    --warn: #f43f5e;
+    --warn-bg: rgba(244, 63, 94, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Canvas Background Particles */
+  #bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Scroll Progress Indicator Bar */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+    width: 0%;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+    transition: width 0.1s ease-out;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* Hero Section */
+  .hero {
+    text-align: center;
+    margin-bottom: 50px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes heroReveal {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    border-radius: 20px;
+    color: #818cf8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    letter-spacing: 0.8px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 14px;
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  /* Glass Form & 3D Tilt Wrapper */
+  form {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 40px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  /* Dynamic Scroll Reveal Class for Sections */
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .section-subtitle {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .form-section {
+    margin-bottom: 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+  }
+
+  .field .hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.25s ease;
+  }
+
+  select option {
+    background: #0d1322;
+    color: #fff;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--primary);
+    background: rgba(15, 23, 42, 0.9);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+    transform: translateY(-2px);
+  }
+
+  /* Range Sliders */
+  .field.rating .rating-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .rating-value {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #818cf8;
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    padding: 0;
+    margin-top: 10px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #818cf8;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--primary-glow);
+    transition: transform 0.15s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+  }
+
+  /* Submit Bar */
+  .submit-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    max-width: 340px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 24px var(--primary-glow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  button[type="submit"]:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.6);
+  }
+
+  button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Results Dynamic Popup Card */
+  #result, #error-card {
+    margin-top: 30px;
+    display: none;
+  }
+
+  .result-card {
+    border-radius: 20px;
+    padding: 28px 36px;
+    border: 1px solid transparent;
+    text-align: center;
+    backdrop-filter: blur(16px);
+    animation: resultPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  @keyframes resultPop {
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .result-card.placed {
+    background: var(--good-bg);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
+  }
+
+  .result-card.not-placed {
+    background: var(--warn-bg);
+    border-color: rgba(244, 63, 94, 0.4);
+    box-shadow: 0 15px 35px rgba(244, 63, 94, 0.2);
+  }
+
+  .result-headline {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+
+  .result-card.placed .result-headline { color: var(--good); }
+  .result-card.not-placed .result-headline { color: var(--warn); }
+
+  .result-detail {
+    margin-top: 10px;
+    font-size: 1.15rem;
+    color: #f3f4f6;
+  }
+
+  .error-card {
+    background: var(--warn-bg);
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    color: #fda4af;
+    padding: 20px 24px;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    form { padding: 24px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">⚡ AI Predictive Engine</div>
+    <h1>Placement Outlook</h1>
+    <p>Scroll down to enter student metrics and unlock real-time placement and salary forecasting.</p>
+  </div>
+
+  <form id="predict-form">
+    <div class="form-section reveal-on-scroll">
+      <div class="section-title">🎓 Academic Record</div>
+      <div class="section-subtitle">Overall performance & university background</div>
+      <div class="grid">
+        <div class="field">
+          <label for="Age">Age</label>
+          <input type="number" id="Age" name="Age" min="17" max="35" value="22" required>
+        </div>
+        <div class="field">
+          <label for="University_Year">University Year</label>
+          <select id="University_Year" name="University_Year" required>
+            <option value="Freshman">Freshman</option>
+            <option value="Sophomore">Sophomore</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior" selected>Senior</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="Major">Major Field</label>
+          <select id="Major" name="Major" required>
+            <option value="Computer Science" selected>Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Data Science">Data Science</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="Business Analytics">Business Analytics</option>
+            <option value="Electrical Engineering">Electrical Engineering</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="CGPA">CGPA (out of 4.0)</label>
+          <input type="number" id="CGPA" name="CGPA" min="0" max="4" step="0.01" value="3.4" required>
+        </div>
+        <div class="field">
+          <label for="Academic_Performance">Academic Performance</label>
+          <select id="Academic_Performance" name="Academic_Performance" required>
+            <option value="Poor">Poor</option>
+            <option value="Average">Average</option>
+            <option value="Good" selected>Good</option>
+            <option value="Excellent">Excellent</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="Attendance_Percentage">Attendance (%)</label>
+          <input type="number" id="Attendance_Percentage" name="Attendance_Percentage" min="0" max="100" value="85" required>
+        </div>
+        <div class="field">
+          <label for="Study_Hours_Per_Week">Study Hours / Week</label>
+          <input type="number" id="Study_Hours_Per_Week" name="Study_Hours_Per_Week" min="0" value="22" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section reveal-on-scroll">
+      <div class="section-title">🚀 Skills & Practical Output</div>
+      <div class="section-subtitle">Core technical capabilities & portfolio strength</div>
+      <div class="grid">
+        <div class="field rating">
+          <div class="rating-header">
+            <label for="Programming_Skill">Programming Skill</label>
+            <span class="rating-value" data-for="Programming_Skill">7</span>
+          </div>
+          <input type="range" id="Programming_Skill" name="Programming_Skill" min="1" max="10" value="7">
+        </div>
+        <div class="field rating">
+          <div class="rating-header">
+            <label for="Communication_Skills">Communication</label>
+            <span class="rating-value" data-for="Communication_Skills">7</span>
+          </div>
+          <input type="range" id="Communication_Skills" name="Communication_Skills" min="1" max="10" value="7">
+        </div>
+        <div class="field rating">
+          <div class="rating-header">
+            <label for="Teamwork">Teamwork</label>
+            <span class="rating-value" data-for="Teamwork">7</span>
+          </div>
+          <input type="range" id="Teamwork" name="Teamwork" min="1" max="10" value="7">
+        </div>
+        <div class="field rating">
+          <div class="rating-header">
+            <label for="Problem_Solving">Problem Solving</label>
+            <span class="rating-value" data-for="Problem_Solving">7</span>
+          </div>
+          <input type="range" id="Problem_Solving" name="Problem_Solving" min="1" max="10" value="7">
+        </div>
+        <div class="field">
+          <label for="Projects_Completed">Projects Completed</label>
+          <input type="number" id="Projects_Completed" name="Projects_Completed" min="0" value="8" required>
+        </div>
+        <div class="field">
+          <label for="Certifications">Certifications</label>
+          <input type="number" id="Certifications" name="Certifications" min="0" value="2" required>
+        </div>
+        <div class="field">
+          <label for="Hackathons">Hackathons Participated</label>
+          <input type="number" id="Hackathons" name="Hackathons" min="0" value="3" required>
+        </div>
+        <div class="field">
+          <label for="Internships">Internships</label>
+          <input type="number" id="Internships" name="Internships" min="0" max="5" value="3" required>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section reveal-on-scroll">
+      <div class="section-title">📊 Assessment & Evaluations</div>
+      <div class="section-subtitle">Scores drawn from resume reviews & mock tests</div>
+      <div class="grid">
+        <div class="field">
+          <label for="Resume_Score">Resume Score (0–100)</label>
+          <input type="number" id="Resume_Score" name="Resume_Score" min="0" max="100" value="90" required>
+        </div>
+        <div class="field">
+          <label for="Interview_Score">Interview Score (0–100)</label>
+          <input type="number" id="Interview_Score" name="Interview_Score" min="0" max="100" value="78" required>
+        </div>
+        <div class="field">
+          <label for="Employability_Score">Employability Score</label>
+          <input type="number" id="Employability_Score" name="Employability_Score" min="0" value="215" required>
+          <div class="hint">Standardized range: 80–280</div>
+        </div>
+        <div class="field">
+          <label for="English_Proficiency">English Proficiency</label>
+          <select id="English_Proficiency" name="English_Proficiency" required>
+            <option value="Basic">Basic</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced" selected>Advanced</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section reveal-on-scroll">
+      <div class="section-title">🌐 Digital Footprint & Background</div>
+      <div class="section-subtitle">Leadership and public developer profiles</div>
+      <div class="grid">
+        <div class="field">
+          <label for="Gender">Gender</label>
+          <select id="Gender" name="Gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="Leadership_Experience">Leadership Experience</label>
+          <select id="Leadership_Experience" name="Leadership_Experience" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="GitHub_Profile">GitHub Profile</label>
+          <select id="GitHub_Profile" name="GitHub_Profile" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="LinkedIn_Profile">LinkedIn Profile</label>
+          <select id="LinkedIn_Profile" name="LinkedIn_Profile" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-bar reveal-on-scroll">
+      <button type="submit" id="submit-btn">Run Prediction Model</button>
+      <span class="hint" id="submit-note">Sends payload directly to your local FastAPI backend server.</span>
+    </div>
+  </form>
+
+  <div id="result">
+    <div class="result-card" id="result-card">
+      <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted);">AI Projection</div>
+      <div class="result-headline" id="result-headline"></div>
+      <div class="result-detail" id="result-detail"></div>
+    </div>
+  </div>
+
+  <div class="error-card" id="error-card"></div>
+</div>
+
+<script>
+  // 1. Scroll-Driven Progress Bar
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('scroll-progress').style.width = scrolled + '%';
+  });
+
+  // 2. Intersection Observer for Smooth Scroll Reveal
+  const observerOptions = {
+    threshold: 0.15,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
+
+  // 3. Interactive Floating Particle Background Canvas
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 0.5;
+      this.speedY = Math.random() * 0.5 + 0.1;
+      this.opacity = Math.random() * 0.5 + 0.1;
+    }
+    update() {
+      this.y -= this.speedY;
+      if (this.y < 0) this.reset();
+    }
+    draw() {
+      ctx.fillStyle = `rgba(129, 140, 248, ${this.opacity})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 50; i++) {
+    particles.push(new Particle());
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // 4. API & Form Logic
+  const API_URL = "http://127.0.0.1:8000/predict";
+
+  document.querySelectorAll('input[type="range"]').forEach(slider => {
+    const label = document.querySelector(`.rating-value[data-for="${slider.id}"]`);
+    slider.addEventListener('input', () => { 
+      label.textContent = slider.value; 
+    });
+  });
+
+  const form = document.getElementById('predict-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const resultBox = document.getElementById('result');
+  const resultCard = document.getElementById('result-card');
+  const resultHeadline = document.getElementById('result-headline');
+  const resultDetail = document.getElementById('result-detail');
+  const errorCard = document.getElementById('error-card');
+
+  const numericFields = new Set([
+    'Age','Attendance_Percentage','Study_Hours_Per_Week','CGPA','Programming_Skill',
+    'Projects_Completed','Certifications','Hackathons','Internships','Communication_Skills',
+    'Teamwork','Problem_Solving','Interview_Score','Employability_Score','Resume_Score'
+  ]);
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    errorCard.style.display = 'none';
+    resultBox.style.display = 'none';
+
+    const formData = new FormData(form);
+    const payload = {};
+    formData.forEach((value, key) => {
+      payload[key] = numericFields.has(key) ? Number(value) : value;
+    });
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing Payload...';
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null);
+        const msg = errBody && errBody.detail
+          ? (typeof errBody.detail === 'string' ? errBody.detail : JSON.stringify(errBody.detail))
+          : ('Request failed with status ' + res.status);
+        throw new Error(msg);
+      }
+
+      const data = await res.json();
+      const isPlaced = data.Placement_Prediction === 'Placed';
+
+      resultCard.className = 'result-card ' + (isPlaced ? 'placed' : 'not-placed');
+      resultHeadline.textContent = isPlaced ? 'High Placement Probability' : 'Placement Unlikely';
+
+      if (isPlaced) {
+        const salary = data.Salary_Prediction;
+        const salaryText = (typeof salary === 'number')
+          ? '$' + Math.round(salary).toLocaleString('en-US')
+          : 'N/A';
+        resultDetail.innerHTML = 'Estimated Starting Salary: <strong>' + salaryText + '</strong>';
+      } else {
+        resultDetail.textContent = 'Salary metrics are unavailable for non-qualifying placement projections.';
+      }
+
+      resultBox.style.display = 'block';
+      resultBox.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+    } catch (err) {
+      errorCard.textContent = 'Failed to fetch prediction. Ensure FastAPI server is live at ' + API_URL + ' (' + err.message + ')';
+      errorCard.style.display = 'block';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Run Prediction Model';
+    }
+  });
+</script>
+
+</body>
+</html>
